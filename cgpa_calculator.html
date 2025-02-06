@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA & CGPA Calculator</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            text-align: center;
+            margin: 20px;
+            color: rgb(19, 19, 19);
+            background-image: url("https://img.freepik.com/premium-photo/top-view-blue-calculator-notepad-color-background_260672-4055.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-weight: 18px;
+        }
+        table {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            position:absolute;
+            right:250px;
+        }
+        th, td {
+            border: 1px solid #080808;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #02107c;
+            color: white;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: white;
+            color: #0f03e3;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #1f50f1;
+            color: white;
+        }
+        input, select {
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            text-align: center;
+            width: 60%;
+            margin: 10px auto;
+            display: block;
+        }
+        .form-container {
+    width: 30%;
+    max-width: 500px;
+    max-height: 1200px;
+    margin: 20px 0 20px 20px; /* Aligns form to the left */
+    padding: 20px;
+    background: rgba(69, 106, 254, 0.8);
+    border-radius: 10px;
+    text-align: left;
+    position: absolute;
+    left: 0;
+    top: 90px;
+    color: black;
+    border-radius: 10px;
+}
+
+        .popup {
+            display: none; 
+            position: fixed; 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%; 
+            max-width: 500px; 
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: black;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .popup button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background: #e60000;
+        }
+
+        /* Background overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        *{
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1><b>GPA & CGPA Calculator (Out of 10)</b></h1>
+
+    <div class="form-container">
+        <h3>Student Details</h3>
+        <label for="studentName" class="form">Student Name:</label>
+        <input type="text" id="studentName" placeholder="Enter student name">
+        
+        <label for="rollNo">Roll Number:</label>
+        <input type="text" id="rollNo" placeholder="Enter roll number">
+        
+        <label for="year">Year of Study:</label>
+        <select id="year">
+            <option value="I">I Year</option>
+            <option value="II">II Year</option>
+            <option value="III">III Year</option>
+            <option value="IV">IV Year</option>
+        </select>
+        
+        <label for="department">Department:</label>
+        <select id="department">
+            <option value="CSE">Computer Science and Engineering</option>
+            <option value="ECE">Electronics and Communication Engineering</option>
+            <option value="EEE">Electrical and Electronics Engineering</option>
+            <option value="IT">Information Technology</option>
+        </select>
+        
+        <label for="semester">Semester:</label>
+        <select id="semester">
+            <option value="1">1st Semester</option>
+            <option value="2">2nd Semester</option>
+            <option value="3">3rd Semester</option>
+            <option value="4">4th Semester</option>
+            <option value="5">5th Semester</option>
+            <option value="6">6th Semester</option>
+            <option value="7">7th Semester</option>
+            <option value="8">8th Semester</option>
+        </select>
+        <h2>CGPA Calculation</h2>
+    <label for="semesters"><h3>Enter Known Semester GPAs:</h3></label>
+    <input type="text" id="semesters" placeholder="e.g. 8.5, 9.2, 7.8">
+    
+    <button onclick="calculateMultiCGPA()">Calculate CGPA</button>
+    </div>
+
+    <table id="gpaTable">
+        <tr>
+            <th>Course</th>
+            <th>Credits</th>
+            <th>Grade</th>
+            <th>Action</th>
+        </tr>
+        <button onclick="addRow()">Add Course</button>
+        <button onclick="calculateGPA()">Calculate GPA</button>
+        
+    </table>
+
+    <div class="overlay" onclick="closePopup()"></div>
+    <div class="popup" id="popup">
+        <h3 id="popupResult"></h3>
+        <button onclick="closePopup()">Close</button>
+    </div>
+    
+    <script>
+        function addRow() {
+            let table = document.getElementById("gpaTable");
+            let row = table.insertRow(-1);
+            row.innerHTML = ` 
+                <td><input type="text" placeholder="Course Name"></td>
+                <td><input type="number" min="1" max="5" value="3"></td>
+                <td>
+                    <select>
+                        <option value="10">O (Outstanding)</option>
+                        <option value="9">A+ (Excellent)</option>
+                        <option value="8">A (Very Good)</option>
+                        <option value="7">B+ (Good)</option>
+                        <option value="6">B (Average)</option>
+                        <option value="5">C (Satisfactory)</option>
+                        <option value="0">U (Reappearance)</option>
+                    </select>
+                </td>
+                <td><button onclick="removeRow(this)">Remove</button></td>
+            `;
+        }
+        
+        function removeRow(button) {
+            let row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+        
+        function calculateGPA() {
+            let table = document.getElementById("gpaTable");
+            let rows = table.getElementsByTagName("tr");
+            let totalCredits = 0;
+            let totalPoints = 0;
+            
+            for (let i = 1; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length > 1) {
+                    let credits = parseFloat(cells[1].children[0].value);
+                    let grade = parseFloat(cells[2].children[0].value);
+                    totalCredits += credits;
+                    totalPoints += credits * grade;
+                }
+            }
+            
+            let gpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
+            showPopup(`Your GPA (Out of 10): ${gpa}`);
+        }
+        
+        function calculateMultiCGPA() {
+            let semGPAInput = document.getElementById("semesters").value;
+            let semGPAs = semGPAInput.split(',').map(num => parseFloat(num.trim())).filter(num => !isNaN(num));
+
+            if (semGPAs.length === 0) {
+                showPopup("Please enter valid semester GPAs.");
+                return;
+            }
+
+            let sumGPA = semGPAs.reduce((sum, gpa) => sum + gpa, 0);
+            let cgpa = sumGPA / semGPAs.length;
+
+            let studentName = document.getElementById("studentName").value;
+            let rollNo = document.getElementById("rollNo").value;
+            let year = document.getElementById("year").value;
+            let department = document.getElementById("department").value;
+            let semester = document.getElementById("semester").value;
+
+            let message = ` 
+                <strong>Student Details:</strong><br>
+                Name: ${studentName}<br>
+                Roll No: ${rollNo}<br>
+                Year: ${year}<br>
+                Department: ${department}<br>
+                Semester: ${semester}<br><br>
+                <strong>Entered Semester GPAs:</strong> ${semGPAs.join(", ")}<br>
+                <strong>Calculated CGPA (Out of 10):</strong> ${cgpa.toFixed(2)}
+            `;
+            showPopup(message);
+        }
+        
+        function showPopup(message) {
+            document.getElementById("popupResult").innerHTML = message;
+            document.querySelector(".overlay").style.display = "block";
+            document.getElementById("popup").style.display = "block";
+        }
+        
+        function closePopup() {
+            document.querySelector(".overlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+        }
+        
+        for (let i = 0; i < 8; i++) {
+            addRow();
+        }
+    </script>
+</body>
+</html>
